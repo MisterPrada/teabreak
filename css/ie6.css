@@ -1,0 +1,19 @@
+/*--------------------------------------------------------------------------------------------------------
+CSS fixes for Internet Explorer 6.
+--------------------------------------------------------------------------------------------------------*/
+
+#header .headerInfo a, 
+#header .logo,
+#content .orderSubm,
+#content .orderBlock .orderImg span,
+#content .shopsList .shopImageFrame,
+#content .contactSubm,
+#content .contactSubm2,
+#content .contactRightBlock {filter:expression(fixPNG(this,'scale')); }
+
+#content {height:100%;}
+#content .more {margin-left:0%;}
+
+#content .orderBlock .title {zoom:1}
+#content .orderBlock .bottomLeft,
+#content .orderBlock .bottomRight {bottom:-4px;}

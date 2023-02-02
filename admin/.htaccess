@@ -1,0 +1,4 @@
+#AuthName "teabreak.by - admin"
+#AuthType Basic
+#AuthUserFile "/home/teabreak/public_html/lib/.htpasswd"
+#require valid-user

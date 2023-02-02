@@ -1,0 +1,177 @@
+{if $page_type == 'default'}
+	<h1>КОРЗИНА</h1>
+	<p>Проверьте содержимое корзины. При необходимости Вы можете изменить количество заказанного товара и пересчитать сумму заказа. Далее переходите к оформлению заказа.</p>
+
+	<h1 class="none">Условия заказа:</h1>
+	<p>Доставка заказов производится по Минску в пределах МКАД, в рабочие дни с {$start_shipping_time} до {$stop_shipping_time} часов. Доставка  бесплатна для заказов на сумму свыше <b>{$free_shipping_summ}</b>  рублей, для заказов на меньшую сумму стоимость доставки составляет: <b>{$shipping_cost}</b> рублей. Минимальный заказ по весу — от {$min_weight} гр любого сорта кофе или чая.<br>
+	Гарантированный срок доставки «СЕГОДНЯ НА СЕГОДНЯ» в случае подачи заказа до {$today_last_time}.</p>
+	<form method="post" action="/cart.php">
+		<div class="orderForm">
+			<table>
+				<tr class="tableHead">
+					<th>№</th>
+					<th>Товар</th>
+					<th>Цена</th>
+					<th class="w100">Количество</th>
+					<th class="w100">Сумма</th>
+					<th class="remove"></th>
+				</tr>
+				{if $cartItems}
+					{foreach name=lastlevel item=cartItem from=$cartItems}
+						<tr>
+							<td></td>
+							<th>{$cartItem.title} {$cartItem.property} {if $cartItem.weight}({$cartItem.weight}){/if}</th>
+							<td>
+								{if $cartItem.price_discount}
+									<span class="lineThrough colorGrey">{$cartItem.price} руб.</span>  {$cartItem.price_discount} руб.
+								{else}
+									{$cartItem.price} руб.
+								{/if} за {$cartItem.min_qtty} {$cartItem.unit}</td>
+							<td><input type="text" name="qtty_{$cartItem.id}_{$cartItem.grinding}" value="{$cartItem.count}"> {$cartItem.unit}</td>
+							<th>{$cartItem.total_price} руб.</th>
+							<td><a class="remove" href="/cart.php?remove={$cartItem.id}-{$cartItem.grinding}" title="удалить">&nbsp;</a></td>
+						</tr>
+					{/foreach}
+				{/if}
+			</table>
+			<div class="totalLine">
+				<input type="submit" name="recalculate" class="contactSubm2 floatLeft" value="ПЕРЕСЧИТАТЬ">
+				<table class="orderTotal">
+					<tr>
+						<td>Всего товаров на сумму: </td>
+						<td> <span>{$total_price}</span> руб.</td>
+					</tr>
+					<tr>
+						<td>Стоимость доставки: </td>
+						<td> <span>{if $total_price>$free_shipping_summ}бесплатно</span> {else} {$shipping_cost}</span>  руб. {/if}</td>
+					</tr>
+					<tr>
+						<td>Итого: </td>
+						<td> <span>{if $total_price<$free_shipping_summ}{$total_price+$shipping_cost} {else} {$total_price}{/if}</span>  руб. </td>
+					</tr>	
+				</table>
+			</div>
+			<input type="button" name="toCatalog" class="contactSubm floatRight" value="ПРОДОЛЖИТЬ ПОКУПКИ" onclick="window.location = '/catalog.php'">
+			<input type="submit" name="order_type" class="contactSubm2 floatRight mr13px" value="ОФОРМИТЬ ЗАКАЗ">
+		</div>
+	</form>
+{/if}
+
+{if $page_type == 'order_type'}
+	<h1>ОФОРМЛЕНИЕ ЗАКАЗА</h1>
+	<div class="orderBlock orderType">
+		<span class="topLeft"></span><span class="topRight"></span><span class="bottomLeft"></span><span class="bottomRight"></span>
+		<h1 class="title">БЫСТРОЕ ОФОРМЛЕНИЕ ЗАКАЗА</h1>
+		<div class="orderContent">
+			<p>Если Вы желаете максимально быстро оформить заказ на товар, нажимайте кнопку "Продолжить".</p>
+			<p>Быстрое оформление заказа не требует регистрации, однако Вы не сможете получать новости о последних новинках в нашем магазине, участвовать в дисконтной программе, отслеживать историю своих заказов.</p>
+			<form method="post" action="/cart.php">
+				<div class="buttons"><input type="submit" name="order" class="contactSubm2" value="ПРОДОЛЖИТЬ"></div>
+			</form>
+		</div>
+	</div>
+	<div class="orderBlock orderType login">
+		<span class="topLeft"></span><span class="topRight"></span><span class="bottomLeft"></span><span class="bottomRight"></span>
+		<h1 class="title">ЗАРЕГИСТРИРОВАННЫЙ ПОЛЬЗОВАТЕЛЬ</h1>
+		<div class="orderContent">
+			<p>Если Вы являетесь зарегистрированным пользователем и помните свои логин и пароль, то введите их в соответствующие поля.</p>
+			<form method="post" action="/cart.php">
+				<div class="inputs">
+					<p><label>Логин:</label> <input type="text" name="login"></p>
+					<p><label>Пароль:</label> <input type="password" name="password"></p>
+				</div>
+				<div class="buttons">
+					<input type="submit" name="order_type" class="orderSubm" value="ВОЙТИ">
+					<a href="/restore.php">Забыли пароль?</a>
+					<a href="/register.php">Регистрация</a>
+					{if $error_message}<div class="red">{$error_message}</div>{/if}
+				</div>
+			</form>
+		</div>
+	</div>
+	<div class="clear"></div>
+{/if}
+
+{if $page_type == 'submit_order'}
+	<h1>ОФОРМЛЕНИЕ ЗАКАЗА</h1>
+	<p>Пожалуйста укажите свои контактные данные и адрес доставки</p>
+	<h1 class="none">Контактные данные:</h1>
+	<form class="contactForm order" method="post" action="/cart.php" onsubmit="return validateContactInfo(this);">
+		<table>
+			<tr>
+				<td style="width:1%">Имя:<span class="asterix">*</span></td>
+				<td><input tabindex="1" class="contactInp" type="text" name="firstname" value="{$smarty.session.firstname}"></td>
+				<td class="w60px">Телефон:<span class="asterix">*</span></td>
+				<td><input tabindex="3" class="contactInp" type="text" name="phone" value="{$smarty.session.phone}"></td>
+			</tr>
+			<tr>
+				<td>Фамилия:</td>
+				<td><input tabindex="2" class="contactInp" type="text" name="lastname" value="{$smarty.session.lastname}"></td>
+				<td class="w60px">E-mail:<span class="asterix">*</span></td>
+				<td><input tabindex="4" class="contactInp" type="text" name="email" value="{$smarty.session.email}"></td>
+			</tr>
+			<tr>
+				<td>Адрес:<span class="asterix">*</span></td>
+				<td colspan="3">
+					<input tabindex="5" class="contactInp wide" type="text" name="shipping_adr" value="{$smarty.session.address} {$smarty.session.sddress2}">
+				</td>
+			</tr>
+			<tr>
+				<td>Пожелания:</td>
+				<td colspan="3"><textarea tabindex="6" class="contactTextarea wide" name="notes"></textarea></td>
+			</tr>
+			<tr>
+				<td colspan="4">
+					<input type="hidden" name="order" value="1">
+					<input tabindex="7" type="submit" name="submitOrder" value="Оформить заказ" class="contactSubm2 floatRight" tabindex="4">
+					Поля со звездочкой <span class="asterix">*</span> обязательны к заполнению
+				</td>
+			</tr>
+		</table>
+	</form>
+{/if}
+
+{if $page_type == 'submit_order' || $page_type == 'order_type'}
+	<h1 class="none">Ваш заказ:</h1>
+	<div class="orderForm">
+		<table>
+			{if $cartItems}
+				{foreach name=lastlevel item=cartItem from=$cartItems}
+					<tr>
+						<th>{$cartItem.title} {$cartItem.property} {if $cartItem.weight}({$cartItem.weight}){/if}</th>
+						<td>
+							{if $cartItem.price_discount}
+								<span class="lineThrough colorGrey">{$cartItem.price} руб.</span>  {$cartItem.price_discount} руб.
+							{else}
+								{$cartItem.price} руб.
+							{/if} за {$cartItem.min_qtty} {$cartItem.unit}</td>
+						<td>{$cartItem.count} {$cartItem.unit}</td>
+						<th>{$cartItem.total_price} руб.</th>
+					</tr>
+				{/foreach}
+			{/if}
+		</table>
+		<div class="totalLine">
+				<table class="orderTotal">
+					<tr>
+						<td>Всего товаров на сумму: </td>
+						<td> <span>{$total_price}</span> руб.</td>
+					</tr>
+					<tr>
+						<td>Стоимость доставки: </td>
+						<td> <span>{if $total_price>$free_shipping_summ}бесплатно</span> {else} {$shipping_cost}</span>  руб. {/if}</td>
+					</tr>
+					<tr>
+						<td>Итого: </td>
+						<td> <span>{if $total_price<$free_shipping_summ}{$total_price+$shipping_cost} {else} {$total_price}{/if}</span>  руб. </td>
+					</tr>	
+				</table>
+		</div>
+	</div>
+{/if}
+
+{if $page_type == 'order_saved'}
+	<h1>ЗАКАЗ ПРИНЯТ</h1>
+	<p>Ваш заказ принят. В ближайшее время с вами свяжется наш сотрудник для уточнения условий доставки. Спасибо за покупку!</p>
+{/if}
+<div class="clear"></div>

@@ -1,0 +1,20 @@
+.portfolio_box_anime{
+	position:relative; 
+	overflow:hidden;
+	float:left;
+	padding-bottom:10px;
+}
+
+
+.portfolio_zoom{
+	width:100%;
+	height:500px;
+	display:none;
+	position:absolute; 
+	top:0;
+	left:0;
+	float:inherit;	
+	background:url(../images/portfolio_bg.png);
+	text-align:center;
+	cursor:pointer;
+}
