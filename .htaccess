@@ -1,7 +1,5 @@
-
 Options +FollowSymLinks
 RewriteEngine on
-
 
 # if forbidden content is requested, OR if requested file is not found, then redirect to index.php
 RewriteCond %{REQUEST_FILENAME} !-s	[OR]
@@ -24,4 +22,3 @@ deny from all
 #AuthType Basic
 #AuthUserFile "/home/teabreak/public_html/lib/.htpasswd"
 #require valid-user
-
